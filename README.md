@@ -19,13 +19,4 @@ Programme pour garder des liens de site personnel ouvert.
 * from tkinter import filedialog, messagebox
 * import main
 * import threading
-* import re      # Pour les expressions régulières (regex) si utiliser, sinon enlever.
 
-
-### Erreur a suivre et vérifier dans le code:
-
-
-
-Pour la fonction  def is_valid_url(url):
-Et la boucle for,  en liens avec la fonction is_valid_url(url) dans la fonction def start_automation(self):
-A vérifier, je reçoie une erreur lors de l'ouverture de l'application.
