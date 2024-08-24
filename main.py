@@ -5,9 +5,19 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import os
+import validators
 
 
-def start_automation(links, max_interval, min_duration, max_duration, log_directory, stop_event):                       # fonction start_automation qui prend en paramètres les liens, l'intervalle maximum, la durée minimale et maximale, le dossier de journalisation et l'événement d'arrêt
+def is_valid_url(url):  # a vérifier sont utilisation ici et dan sAutomation_Gui.py
+    return validators.url(url)
+
+
+def start_automation(links, max_interval, min_duration, max_duration, log_directory, stop_event):
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    log_file = os.path.join(log_directory, f"log_{current_date}.txt")
+
+    os.makedirs(log_directory, exist_ok=True)
+
     # Configurer les options du navigateur Chrome
     options = webdriver.ChromeOptions()                                                                                 # Créer une instance de ChromeOptions
     options.add_argument("--disable-gpu")                                                                               # Ajouter des arguments pour désactiver le GPU, le sandbox et l'utilisation de la mémoire partagée
@@ -20,13 +30,11 @@ def start_automation(links, max_interval, min_duration, max_duration, log_direct
     options.add_argument("--remote-debugging-port=9222")                                                                # Ajouter un argument pour spécifier le port de débogage
     # options.add_argument("--headless")                                                                                  # Décommentez cette ligne pour exécuter en mode headless
 
-    # Créer le dossier des journaux s'il n'existe pas
-    os.makedirs(log_directory, exist_ok=True)                                                                           # Créer le dossier de journalisation s'il n'existe pas
-
     if stop_event.is_set():                                                                                             # Vérifier si l'événement d'arrêt est défini
         return                                                                                                          # Retourner si l'événement d'arrêt est défini
 
-    liens_ouverts = []                                                                                                  # Créer une liste pour stocker les liens déjà ouverts
+    liens_ouverts = []
+    lien = None  # Initialize lien variable
 
     while not stop_event.is_set():                                                                                      # Boucle tant que l'événement d'arrêt n'est pas défini
         interval_ouverture = random.randint(1, max_interval)                                                         # Générer un intervalle d'ouverture aléatoire (entre 1 et l'intervalle maximum)
@@ -38,8 +46,8 @@ def start_automation(links, max_interval, min_duration, max_duration, log_direct
         service = Service(ChromeDriverManager().install())                                                              # Initialiser le service du pilote Chrome
         driver = webdriver.Chrome(service=service, options=options)                                                     # Initialiser le pilote Chrome avec les options spécifiées
 
-        current_date = datetime.now().strftime("%Y-%m-%d")                                                              # Obtenir la date actuelle
-        log_file = os.path.join(log_directory, f"log_{current_date}.txt")                                               # Construire le chemin du fichier journal
+        # current_date = datetime.now().strftime("%Y-%m-%d")                                                              # Obtenir la date actuelle
+        # log_file = os.path.join(log_directory, f"log_{current_date}.txt")                                               # Construire le chemin du fichier journal
 
         with open(log_file, "a") as f:                                                                                  # Écrire les informations dans le fichier journal
             f.write(f"Intervalle d'ouverture : {interval_ouverture} minutes\n")                                         # Écrire l'intervalle d'ouverture
@@ -47,6 +55,7 @@ def start_automation(links, max_interval, min_duration, max_duration, log_direct
             f.write(f"Page ouverte à {time.strftime('%H:%M:%S')}\n")                                                    # Écrire l'heure d'ouverture
 
         try:                                                                                                            # Essayer d'ouvrir la page web
+            # ne fonctionne pas correctement, une fois la liste des url passé il remet toujours la meme et elle deviens une erreur d'url, meme si elle a déjafonctionné
 
             lien = random.choice([link for link in links if link not in liens_ouverts])                                 # Trouver un lien qui n'a pas été ouvert récemment
             liens_ouverts.append(lien)                                                                                  # Ajouter le lien à la liste des liens ouverts
@@ -64,8 +73,10 @@ def start_automation(links, max_interval, min_duration, max_duration, log_direct
                     break                                                                                               # Sortir de la boucle si l'événement d'arrêt est défini
                 time.sleep(1)                                                                                           # Attendre 1 seconde
 
-        except Exception as e:                                                                                          # Gérer les exceptions
-            print(f"Erreur lors de l'ouverture de la page: {e}")                                                        # Afficher l'erreur
+        except Exception as e:
+            print(f"Erreur lors de l'ouverture de la page: {e}")
+            with open(log_file, "a") as f:
+                f.write(f"Erreur lors de l'ouverture de la page: URL invalide: {lien}\n")                                                        # Afficher l'erreur
 
         finally:                                                                                                        # Exécuter le code final
             with open(log_file, "a") as f:                                                                              # Écrire la fermeture de la page dans le fichier journal
@@ -76,7 +87,7 @@ def start_automation(links, max_interval, min_duration, max_duration, log_direct
         for _ in range(interval_ouverture * 60):                                                                        # Attendre jusqu'à la prochaine ouverture (en secondes)
             if stop_event.is_set():                                                                                     # Vérifier si l'événement d'arrêt est défini
                 break                                                                                                   # Sortir de la boucle si l'événement d'arrêt est défini
-            time.sleep(1)                                                                                               # Attendre 1 seconde
+            time.sleep(1)                                                                                               # Attendre 1 secondes
 
 
 """

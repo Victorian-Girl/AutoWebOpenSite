@@ -2,19 +2,6 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 import main
 import threading
-# import re
-#
-#
-# def is_valid_url(url):
-#     regex = re.compile(
-#         r'^(?:http|ftp)s?://'  # http:// or https://
-#         r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
-#         r'localhost|'  # localhost...
-#         r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'  # ...or ipv4
-#         r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  # ...or ipv6
-#         r'(?::\d+)?'  # optional port
-#         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-#     return re.match(regex, url) is not None
 
 
 class AutomationGUI:
@@ -104,25 +91,21 @@ class AutomationGUI:
             messagebox.showerror("Erreur", "Veuillez entrer au moins un lien.")
             return
 
-        # valid_links = []
-        # invalid_links = []
-        # for i, link in enumerate(links):
-        #     if not is_valid_url(link):
-        #         self.link_entries[i].config(fg="red")
-        #         invalid_links.append(link)
-        #     else:
-        #         self.link_entries[i].config(fg="black")
-        #         valid_links.append(link)
-        #
-        # if invalid_links:
-        #     with open("error_log.txt", "a") as log_file:
-        #         for link in invalid_links:
-        #             log_file.write(f"Invalid URL: {link}\n")
-        #     messagebox.showerror("Erreur",
-        #                          "Un ou plusieurs liens sont invalides. Veuillez vérifier les liens en rouge.")
-        #
-        # if not valid_links:
-        #     return
+        valid_links = []        # a regarder pourqoui les lien pas correct ne devienne pas rouge et ne sont pas pris en compte
+        invalid_links = []
+        for i, link in enumerate(links):
+            if not main.is_valid_url(link):
+                self.link_entries[i].config(bg="red")
+                invalid_links.append(link)
+            else:
+                self.link_entries[i].config(bg="white")
+                valid_links.append(link)
+
+        if invalid_links:
+            messagebox.showerror("Erreur", "Un ou plusieurs liens sont invalides. Veuillez vérifier les liens en rouge.")
+
+        if not valid_links:
+            return
 
         if not self.max_interval_entry.get():
             messagebox.showerror("Erreur", "Veuillez spécifier un intervalle d'ouverture maximum.")
@@ -162,7 +145,7 @@ class AutomationGUI:
 
         self.stop_event.clear()
         self.automation_thread = threading.Thread(target=main.start_automation,
-                                                  args=(links, max_interval, min_duration, max_duration,
+                                                  args=(valid_links, max_interval, min_duration, max_duration,
                                                         log_directory, self.stop_event))
         self.automation_thread.start()
 
