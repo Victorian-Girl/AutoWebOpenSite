@@ -91,21 +91,21 @@ class AutomationGUI:
             messagebox.showerror("Erreur", "Veuillez entrer au moins un lien.")
             return
 
-        valid_links = []        # a regarder pourqoui les lien pas correct ne devienne pas rouge et ne sont pas pris en compte
-        invalid_links = []
-        for i, link in enumerate(links):
-            if not main.is_valid_url(link):
-                self.link_entries[i].config(bg="red")
-                invalid_links.append(link)
-            else:
-                self.link_entries[i].config(bg="white")
-                valid_links.append(link)
-
-        if invalid_links:
-            messagebox.showerror("Erreur", "Un ou plusieurs liens sont invalides. Veuillez vérifier les liens en rouge.")
-
-        if not valid_links:
-            return
+        # valid_links = []        # a regarder pourquoi les lien pas correct ne devienne pas rouge et ne sont pas pris en compte
+        # invalid_links = []
+        # for i, link in enumerate(links):
+        #     if not main.is_valid_url(link):
+        #         self.link_entries[i].config(bg="red")
+        #         invalid_links.append(link)
+        #     else:
+        #         self.link_entries[i].config(bg="white")
+        #         valid_links.append(link)
+        #
+        # if invalid_links:
+        #     messagebox.showerror("Erreur", "Un ou plusieurs liens sont invalides. Veuillez vérifier les liens en rouge.")
+        #
+        # if not valid_links:
+        #     return
 
         if not self.max_interval_entry.get():
             messagebox.showerror("Erreur", "Veuillez spécifier un intervalle d'ouverture maximum.")
@@ -145,7 +145,7 @@ class AutomationGUI:
 
         self.stop_event.clear()
         self.automation_thread = threading.Thread(target=main.start_automation,
-                                                  args=(valid_links, max_interval, min_duration, max_duration,
+                                                  args=(links, max_interval, min_duration, max_duration,
                                                         log_directory, self.stop_event))
         self.automation_thread.start()
 

@@ -5,11 +5,11 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import os
-import validators
+# import validators
 
 
-def is_valid_url(url):  # a vérifier sont utilisation ici et dan sAutomation_Gui.py
-    return validators.url(url)
+# def is_valid_url(url):  # a vérifier son utilisation ici et dans Automation_Gui.py
+#     return validators.url(url)
 
 
 def start_automation(links, max_interval, min_duration, max_duration, log_directory, stop_event):
@@ -17,6 +17,20 @@ def start_automation(links, max_interval, min_duration, max_duration, log_direct
     log_file = os.path.join(log_directory, f"log_{current_date}.txt")
 
     os.makedirs(log_directory, exist_ok=True)
+
+    # for link in links:
+    #     if not is_valid_url(link):
+    #         with open(log_file, "a") as f:
+    #             f.write(f"Invalid URL: {link}. See log for details.\n")
+    #         continue
+    #     try:
+    #         # Code to open the link in Chrome
+    #         # Simulate an error for demonstration
+    #         raise Exception("Erreur lors de l'ouverture de la page: Message: unknown error: net::ERR_NAME_NOT_RESOLVED")
+    #     except Exception:
+    #         with open(log_file, "a") as f:
+    #             f.write(f"Erreur lors de l'ouverture de {link}: URL invalide\n")
+    #         continue
 
     # Configurer les options du navigateur Chrome
     options = webdriver.ChromeOptions()                                                                                 # Créer une instance de ChromeOptions
@@ -55,7 +69,7 @@ def start_automation(links, max_interval, min_duration, max_duration, log_direct
             f.write(f"Page ouverte à {time.strftime('%H:%M:%S')}\n")                                                    # Écrire l'heure d'ouverture
 
         try:                                                                                                            # Essayer d'ouvrir la page web
-            # ne fonctionne pas correctement, une fois la liste des url passé il remet toujours la meme et elle deviens une erreur d'url, meme si elle a déjafonctionné
+            # ne fonctionne pas correctement, une fois la liste des url passé il remet toujours la meme et elle deviens une erreur d'url, meme si elle a déja fonctionné
 
             lien = random.choice([link for link in links if link not in liens_ouverts])                                 # Trouver un lien qui n'a pas été ouvert récemment
             liens_ouverts.append(lien)                                                                                  # Ajouter le lien à la liste des liens ouverts
